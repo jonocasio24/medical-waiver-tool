@@ -60,7 +60,7 @@
       font-size: 0.9rem;
     }
 
-    .layout { display: grid; grid-template-columns: 390px 1fr; gap: 18px; }
+    .layout { display: grid; grid-template-columns: 430px minmax(0, 1fr); gap: 18px; align-items: start; }
     @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } }
 
     .panel {
@@ -69,7 +69,7 @@
       border-radius: var(--radius);
       box-shadow: 0 10px 26px rgba(15, 60, 75, 0.06);
     }
-    .panel-inner { padding: 18px; }
+    .panel-inner { padding: 16px; }
     .panel h2, .panel h3 { margin: 0 0 12px; }
     .section-label {
       display: inline-flex;
@@ -85,15 +85,17 @@
     }
     .field-grid { display: grid; gap: 12px; }
     .field { display: grid; gap: 7px; }
-    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .field-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
     @media (max-width: 680px) { .field-row { grid-template-columns: 1fr; } }
     label { font-weight: 700; font-size: 0.92rem; color: var(--ink); }
     input[type="text"], input[type="number"], select, textarea {
       width: 100%;
-      padding: 12px 14px;
+      width: 100%;
+      min-width: 0;
+      padding: 10px 12px;
       border: 1px solid #c9dde2;
-      border-radius: 14px;
-      font-size: 0.96rem;
+      border-radius: 12px;
+      font-size: 0.92rem;
       background: #fcfefe;
       color: var(--ink);
       outline: none;
@@ -123,9 +125,9 @@
       border: none;
       cursor: pointer;
       font-weight: 800;
-      padding: 12px 16px;
-      border-radius: 14px;
-      font-size: 0.95rem;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 0.9rem;
       transition: 0.18s ease;
     }
     .btn-primary { background: linear-gradient(135deg, #0f3c4b, #167c80); color: white; box-shadow: 0 12px 26px rgba(15, 60, 75, 0.18); }
@@ -142,7 +144,7 @@
       padding: 16px;
     }
     .metric .kicker { font-size: 0.76rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
-    .metric .value { font-size: 1.08rem; font-weight: 800; margin-top: 8px; line-height: 1.25; }
+    .metric .value { font-size: 1rem; font-weight: 800; margin-top: 8px; line-height: 1.25; word-break: break-word; }
 
     .status-banner {
       display: flex;
@@ -197,43 +199,195 @@
     }
     .footer-note { margin-top: 14px; font-size: 0.88rem; color: var(--muted); line-height: 1.45; }
     .hidden { display: none; }
+
+    .hero.hero-bottom { margin-top: 18px; margin-bottom: 0; }
+    .collapsible-toggle {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: transparent;
+      padding: 0;
+      color: inherit;
+      box-shadow: none;
+      border-radius: 0;
+      font: inherit;
+      text-align: left;
+    }
+    .collapsible-toggle:hover { transform: none; }
+    .collapsible-toggle .toggle-text { display: flex; flex-direction: column; gap: 4px; }
+    .collapsible-toggle .toggle-title { font-weight: 800; font-size: 1rem; color: var(--ink); }
+    .collapsible-toggle .toggle-subtitle { font-size: 0.85rem; color: var(--muted); font-weight: 600; }
+    .toggle-icon {
+      width: 34px;
+      height: 34px;
+      min-width: 34px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #e9f5f6;
+      color: var(--navy);
+      font-size: 1.15rem;
+      font-weight: 900;
+      border: 1px solid #cfe5e7;
+    }
+    .collapsible-content { overflow: hidden; transition: max-height 0.24s ease, opacity 0.2s ease, margin-top 0.2s ease; }
+    .is-collapsed .collapsible-content { max-height: 0 !important; opacity: 0; margin-top: 0 !important; }
+    .panel-collapsible .panel-inner > .section-label { margin-bottom: 10px; }
+    .panel-collapsible .collapsible-content { margin-top: 10px; }
+    .card.collapsible-card { padding-top: 14px; padding-bottom: 14px; }
+    .card.collapsible-card .collapsible-content { margin-top: 12px; }
+
+    .multi-condition-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+    .condition-stack { display: grid; gap: 8px; }
+    .field-row.input-priority { grid-template-columns: 1fr; }
+    .category-inline { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 8px; align-items: end; }
+    .category-inline .field { margin: 0; }
+    .field input, .field select { min-height: 42px; }
+    #applicantName { max-width: 220px; min-height: 42px; }
+    .field.compact-field { max-width: 220px; }
+    .condition-field { width: 100%; }
+    .condition-field .condition-stack, .condition-field .category-inline, .condition-field .multi-condition-row { width: 100%; }
+    .selected-conditions-wrap .small { margin-bottom: 2px; }
+    #conditionSearch { width: 100%; }
+    .multi-condition-row input { min-width: 0; }
+    @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } .field.compact-field, #applicantName { max-width: 100%; } }
+    @media (max-width: 680px) { .multi-condition-row, .category-inline, .field-row.input-priority { grid-template-columns: 1fr; } }
+    .btn-small { padding: 10px 12px; white-space: nowrap; }
+    .selected-conditions-wrap { margin-top: 10px; }
+    .selected-conditions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+    .selected-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #edf7f8; border: 1px solid #cae6e8; color: var(--navy);
+      padding: 8px 10px; border-radius: 999px; font-size: 0.86rem; font-weight: 700;
+    }
+    .selected-pill button {
+      padding: 0; background: transparent; color: var(--navy); box-shadow: none; border: none;
+      font-size: 1rem; line-height: 1; min-width: 18px;
+    }
+    .condition-block { border: 1px solid var(--line); border-radius: 16px; padding: 12px; background: #fdfefe; margin-top: 12px; }
+    .condition-block h4 { margin: 0 0 8px; font-size: 1rem; }
+    .condition-block ul { margin-top: 6px; }
+
+    @media (max-width: 680px) {
+      body { padding: 12px; }
+      .panel-inner { padding: 14px; }
+      .card { padding: 14px; }
+      .metric { padding: 14px; }
+      .hero { padding: 18px; border-radius: 22px; }
+      .toggle-icon { width: 30px; height: 30px; min-width: 30px; }
+      .btn-small, .btn-primary, .btn-secondary { width: 100%; }
+    }
+
+    .print-only { display: none !important; }
+
+    @media print {
+      @page { size: auto; margin: 0.5in; }
+      html, body { background: #ffffff !important; }
+      body { padding: 0 !important; font-size: 11pt; }
+      .app { max-width: none; }
+      .layout { display: block !important; }
+      aside.panel { display: none !important; }
+      main.panel {
+        border: none !important;
+        box-shadow: none !important;
+        background: #ffffff !important;
+      }
+      .panel-inner { padding: 0 !important; }
+      .hero, .hero-bottom { display: none !important; }
+      .section-label, .footer-note { display: none !important; }
+      .collapsible-toggle { display: none !important; }
+      [data-collapsible], .collapsible-card { break-inside: avoid; page-break-inside: avoid; }
+      .collapsible-content {
+        max-height: none !important;
+        opacity: 1 !important;
+        overflow: visible !important;
+        margin-top: 0 !important;
+      }
+      .is-collapsed .collapsible-content { max-height: none !important; opacity: 1 !important; }
+      .card, .metric, .status-banner, .muted-box, .condition-block {
+        break-inside: avoid;
+        page-break-inside: avoid;
+        box-shadow: none !important;
+      }
+      .summary-grid { grid-template-columns: repeat(2, 1fr) !important; }
+      .two-col { grid-template-columns: 1fr !important; }
+      .print-only { display: block !important; }
+      .print-header {
+        margin-bottom: 18px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #d8e8ec;
+      }
+      .print-header h1 {
+        margin: 0 0 6px;
+        font-size: 20pt;
+        color: #17343c;
+      }
+      .print-meta {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px 16px;
+        font-size: 10pt;
+        color: #35525a;
+      }
+      .print-note {
+        margin-top: 8px;
+        font-size: 9.5pt;
+        color: #4f6871;
+      }
+    }
+
   </style>
 </head>
 <body>
   <div class="app">
-    <section class="hero">
-      <h1>Medical Waiver Decision Support Tool</h1>
-      <p>Recruiter-facing decision support built from DoDI 6130.03 baseline disqualification standards, FY25 Waiver Risk Guidance, and Medical Waiver TTP packet requirements. Use it to identify likely packet needs, flag higher-risk facts, and generate a cleaner recruiter action plan.</p>
-      <div class="hero-badges">
-        <div class="hero-badge">Mobile-friendly medical layout</div>
-        <div class="hero-badge">Condition in -> packet guidance out</div>
-        <div class="hero-badge">Universal TTP checklist included</div>
-      </div>
-    </section>
-
-    <div class="layout">
-      <aside class="panel">
+<div class="layout">
+      <aside class="panel panel-collapsible" data-collapsible="open">
         <div class="panel-inner">
           <div class="section-label">Recruiter Inputs</div>
+          <button class="collapsible-toggle" type="button" aria-expanded="true">
+            <span class="toggle-text">
+              <span class="toggle-title">Recruiter Inputs</span>
+              <span class="toggle-subtitle">Open or collapse the input section</span>
+            </span>
+            <span class="toggle-icon">−</span>
+          </button>
+          <div class="collapsible-content">
 
           <div class="field-grid">
-            <div class="field-row">
-              <div class="field">
+            <div class="field-row input-priority">
+              <div class="field compact-field">
                 <label for="applicantName">Applicant name</label>
                 <input id="applicantName" type="text" placeholder="Optional" />
               </div>
-              <div class="field">
+              <div class="field condition-field">
                 <label for="conditionSearch">Condition</label>
-                <input id="conditionSearch" list="conditionList" placeholder="Search condition..." />
-                <datalist id="conditionList"></datalist>
+                <div class="condition-stack">
+                  <div class="category-inline">
+                    <div class="field">
+                      <label for="categoryFilter">Category</label>
+                      <select id="categoryFilter"></select>
+                    </div>
+                    <div class="field">
+                      <label for="conditionSearch">Condition search</label>
+                      <div class="multi-condition-row">
+                        <input id="conditionSearch" list="conditionList" placeholder="Pick a category, then search or type a condition..." />
+                        <button class="btn-secondary btn-small" id="addConditionBtn" type="button">Add Condition</button>
+                      </div>
+                    </div>
+                  </div>
+                  <datalist id="conditionList"></datalist>
+                  <div class="selected-conditions-wrap">
+                    <div class="small">Selected conditions</div>
+                    <div id="selectedConditions" class="selected-conditions"></div>
+                  </div>
+                </div>
               </div>
             </div>
 
             <div class="field-row">
-              <div class="field">
-                <label for="categoryFilter">Category</label>
-                <select id="categoryFilter"></select>
-              </div>
               <div class="field">
                 <label for="recordsStatus">Records in hand</label>
                 <select id="recordsStatus">
@@ -282,22 +436,33 @@
           <div class="btn-row">
             <button class="btn-primary" id="runBtn">Generate Decision</button>
             <button class="btn-secondary" id="resetBtn">Reset</button>
+            <button class="btn-secondary" id="printBtn" type="button">Print Report</button>
           </div>
 
           <div class="footer-note">
             This tool is a decision-support aid. It does not replace MEPS, the approving medical authority, or official waiver routing. Use it to tighten packet prep and record collection.
           </div>
+        
+          </div>
         </div>
       </aside>
 
-      <main class="panel">
+      <main class="panel panel-collapsible" data-collapsible="closed">
         <div class="panel-inner">
           <div class="section-label">Decision Output</div>
+          <button class="collapsible-toggle" type="button" aria-expanded="true">
+            <span class="toggle-text">
+              <span class="toggle-title">Decision Output</span>
+              <span class="toggle-subtitle">Open or collapse the result section</span>
+            </span>
+            <span class="toggle-icon">−</span>
+          </button>
+          <div class="collapsible-content">
 
           <div class="summary-grid">
-            <div class="metric"><div class="kicker">Selected condition</div><div class="value" id="metricCondition">Choose a condition</div></div>
-            <div class="metric"><div class="kicker">Category</div><div class="value" id="metricCategory">-</div></div>
-            <div class="metric"><div class="kicker">Likely lane</div><div class="value" id="metricLane">-</div></div>
+            <div class="metric"><div class="kicker">Selected conditions</div><div class="value" id="metricCondition">Choose one or more conditions</div></div>
+            <div class="metric"><div class="kicker">Categories</div><div class="value" id="metricCategory">-</div></div>
+            <div class="metric"><div class="kicker">Overall lane</div><div class="value" id="metricLane">-</div></div>
             <div class="metric"><div class="kicker">Packet posture</div><div class="value" id="metricPacket">-</div></div>
           </div>
 
@@ -310,52 +475,196 @@
 
           <div class="two-col">
             <div>
-              <div class="card">
+              <div class="card collapsible-card" data-collapsible="closed">
                 <div class="condition-head">
-                  <h2 class="condition-title" id="conditionTitle">No condition selected</h2>
+                  <h2 class="condition-title" id="conditionTitle">No conditions selected</h2>
                 </div>
                 <div id="conditionTags"></div>
-                <div class="muted-box" id="baselineText">The condition summary and baseline disqualification standard will appear here.</div>
+                <div id="baselineText">
+                  <div class="muted-box">The condition summary and baseline disqualification standard will appear here.</div>
+                </div>
               </div>
 
-              <div class="card">
-                <h3>Required submission items</h3>
+              <div class="card collapsible-card" data-collapsible="closed">
+                <button class="collapsible-toggle" type="button" aria-expanded="true">
+                  <span class="toggle-text">
+                    <span class="toggle-title">Required submission items</span>
+                    <span class="toggle-subtitle">Shows condition-specific records to collect</span>
+                  </span>
+                  <span class="toggle-icon">−</span>
+                </button>
+                <div class="collapsible-content">
                 <ul id="docList"></ul>
               </div>
+              </div>
 
-              <div class="card">
-                <h3>Recruiter action steps</h3>
+              <div class="card collapsible-card" data-collapsible="closed">
+                <button class="collapsible-toggle" type="button" aria-expanded="true">
+                  <span class="toggle-text">
+                    <span class="toggle-title">Recruiter action steps</span>
+                    <span class="toggle-subtitle">Shows the recommended next steps</span>
+                  </span>
+                  <span class="toggle-icon">−</span>
+                </button>
+                <div class="collapsible-content">
                 <ul id="actionList"></ul>
+              </div>
               </div>
             </div>
 
             <div>
-              <div class="card">
-                <h3>Risk guidance</h3>
+              <div class="card collapsible-card" data-collapsible="closed">
+                <button class="collapsible-toggle" type="button" aria-expanded="true">
+                  <span class="toggle-text">
+                    <span class="toggle-title">Risk guidance</span>
+                    <span class="toggle-subtitle">Shows favorable and elevated factors</span>
+                  </span>
+                  <span class="toggle-icon">−</span>
+                </button>
+                <div class="collapsible-content">
                 <ul id="riskList"></ul>
               </div>
-
-              <div class="card">
-                <h3>Universal medical waiver packet items</h3>
-                <ul id="universalList"></ul>
               </div>
 
-              <div class="card">
-                <h3>Applicant-specific notes</h3>
+              <div class="card collapsible-card" data-collapsible="closed">
+                <button class="collapsible-toggle" type="button" aria-expanded="true">
+                  <span class="toggle-text">
+                    <span class="toggle-title">Universal medical waiver packet items</span>
+                    <span class="toggle-subtitle">Shows the standard packet requirements</span>
+                  </span>
+                  <span class="toggle-icon">−</span>
+                </button>
+                <div class="collapsible-content">
+                <ul id="universalList"></ul>
+              </div>
+              </div>
+
+              <div class="card collapsible-card" data-collapsible="closed">
+                <button class="collapsible-toggle" type="button" aria-expanded="true">
+                  <span class="toggle-text">
+                    <span class="toggle-title">Applicant-specific notes</span>
+                    <span class="toggle-subtitle">Shows recruiter-entered notes</span>
+                  </span>
+                  <span class="toggle-icon">−</span>
+                </button>
+                <div class="collapsible-content">
                 <div id="customNotes" class="small">No applicant-specific notes added yet.</div>
+              </div>
               </div>
             </div>
           </div>
 
+          
           <div class="footer-note">
             Source basis embedded in this version: DoDI 6130.03 medical entrance standards, FY25 Waiver Risk Guidance condition-specific submission notes, and Medical Waiver TTP packet requirements.
+          </div>
           </div>
         </div>
       </main>
     </div>
+
+
+    <section class="hero hero-bottom">
+      <h1>Medical Waiver Decision Support Tool</h1>
+      <p>Recruiter-facing decision support built from DoDI 6130.03 baseline disqualification standards, FY25 Waiver Risk Guidance, and Medical Waiver TTP packet requirements. Use it to identify likely packet needs, flag higher-risk facts, and generate a cleaner recruiter action plan.</p>
+      <div class="hero-badges">
+        <div class="hero-badge">Mobile-friendly medical layout</div>
+        <div class="hero-badge">Condition in -> packet guidance out</div>
+        <div class="hero-badge">Universal TTP checklist included</div>
+      </div>
+    </section>
+
+    
   </div>
 
 <script>
+
+function setCollapsibleState(container, expanded) {
+  const button = container.querySelector('.collapsible-toggle');
+  const content = container.querySelector('.collapsible-content');
+  const icon = container.querySelector('.toggle-icon');
+  if (!button || !content || !icon) return;
+  if (expanded) {
+    container.classList.remove('is-collapsed');
+    button.setAttribute('aria-expanded', 'true');
+    icon.textContent = '−';
+    content.style.maxHeight = content.scrollHeight + 'px';
+    content.style.opacity = '1';
+  } else {
+    container.classList.add('is-collapsed');
+    button.setAttribute('aria-expanded', 'false');
+    icon.textContent = '+';
+    content.style.maxHeight = '0px';
+    content.style.opacity = '0';
+  }
+}
+function refreshExpandedHeights() {
+  document.querySelectorAll('[data-collapsible]').forEach((container) => {
+    const button = container.querySelector('.collapsible-toggle');
+    const content = container.querySelector('.collapsible-content');
+    if (button && content && button.getAttribute('aria-expanded') === 'true') {
+      content.style.maxHeight = 'none';
+      const nextHeight = content.scrollHeight;
+      content.style.maxHeight = nextHeight + 'px';
+    }
+  });
+}
+function scheduleHeightRefresh() {
+  requestAnimationFrame(() => {
+    refreshExpandedHeights();
+    requestAnimationFrame(refreshExpandedHeights);
+  });
+}
+function initCollapsibles() {
+  const containers = document.querySelectorAll('[data-collapsible]');
+  containers.forEach((container) => {
+    const button = container.querySelector('.collapsible-toggle');
+    const content = container.querySelector('.collapsible-content');
+    if (!button || !content) return;
+    const expandedDefault = container.dataset.collapsible !== 'closed';
+    setCollapsibleState(container, expandedDefault);
+    button.addEventListener('click', () => {
+      const expanded = button.getAttribute('aria-expanded') === 'true';
+      setCollapsibleState(container, !expanded);
+      scheduleHeightRefresh();
+    });
+  });
+  window.addEventListener('resize', refreshExpandedHeights);
+}
+
+
+function watchExpandedContent() {
+  const observer = new MutationObserver(() => scheduleHeightRefresh());
+  document.querySelectorAll('.collapsible-content').forEach((content) => {
+    observer.observe(content, { childList: true, subtree: true, characterData: true });
+  });
+}
+
+
+function updatePrintHeader() {
+  const applicant = document.getElementById('applicantName')?.value.trim() || 'Not entered';
+  const selected = selectedConditionNames.length ? selectedConditionNames.join(', ') : 'None selected';
+  const recordsMap = {
+    none: 'No records yet',
+    partial: 'Partial records',
+    complete: 'Most records in hand'
+  };
+  const recordsValue = document.getElementById('recordsStatus')?.value || 'none';
+  const recordsLabel = recordsMap[recordsValue] || 'No records yet';
+  const now = new Date();
+  const prepared = now.toLocaleString([], { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+
+  const setText = (id, value) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+  };
+  setText('printApplicantName', applicant);
+  setText('printSelectedConditions', selected);
+  setText('printRecordsStatus', recordsLabel);
+  setText('printPreparedDate', prepared);
+}
+
+
 const universalDocs = [
   "Applicant's current MEPS medical examination (MHS-Genesis Summary Report or DD 2808) with no open profiles.",
   "DD Form 2807-2.",
@@ -970,6 +1279,8 @@ const recordsStatus = document.getElementById('recordsStatus');
 const timeSince = document.getElementById('timeSince');
 const activityLevel = document.getElementById('activityLevel');
 const recruiterNotes = document.getElementById('recruiterNotes');
+const selectedConditionsEl = document.getElementById('selectedConditions');
+let selectedConditionNames = [];
 
 function fillDatalist(items) {
   conditionList.innerHTML = items.map(c => `<option value="${c.name}"></option>`).join('');
@@ -991,6 +1302,41 @@ function findCondition(name) {
   const q = (name || '').trim().toLowerCase();
   if (!q) return null;
   return conditions.find(c => c.name.toLowerCase() === q) || conditions.find(c => [c.name, ...(c.aliases||[])].some(a => a.toLowerCase().includes(q) || q.includes(a.toLowerCase())));
+}
+function findConditionExact(name) {
+  const q = (name || '').trim().toLowerCase();
+  if (!q) return null;
+  return conditions.find(c => c.name.toLowerCase() === q) || conditions.find(c => (c.aliases||[]).some(a => a.toLowerCase() === q));
+}
+function renderSelectedConditions() {
+  if (!selectedConditionNames.length) {
+    selectedConditionsEl.innerHTML = '<span class="small">No conditions added yet.</span>';
+    return;
+  }
+  selectedConditionsEl.innerHTML = selectedConditionNames.map(name => `
+    <span class="selected-pill">${name}
+      <button type="button" data-name="${name.replace(/"/g, '&quot;')}" aria-label="Remove ${name}">×</button>
+    </span>
+  `).join('');
+  selectedConditionsEl.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectedConditionNames = selectedConditionNames.filter(n => n !== btn.dataset.name);
+      renderSelectedConditions();
+    });
+  });
+}
+function addConditionSelection() {
+  const condition = findCondition(conditionSearch.value);
+  if (!condition) {
+    setDefaultState('Condition not found', 'Pick a condition from the searchable list or start typing a common alias like asthma, ADHD, eczema, scoliosis, seizure, sleep apnea, or glaucoma.');
+    return;
+  }
+  if (!selectedConditionNames.includes(condition.name)) {
+    selectedConditionNames.push(condition.name);
+  }
+  conditionSearch.value = '';
+  renderSelectedConditions();
+  refreshExpandedHeights();
 }
 function renderConditionList() {
   const cat = categoryFilter.value;
@@ -1052,50 +1398,81 @@ function computeDecision(condition, facts, records, timeKey, activityKey) {
 }
 
 function renderDecision() {
-  const condition = findCondition(conditionSearch.value);
-  if (!condition) {
-    setDefaultState('Condition not found', 'Pick a condition from the searchable list or start typing a common alias like asthma, ADHD, eczema, scoliosis, seizure, sleep apnea, or glaucoma.');
+  const directCondition = findCondition(conditionSearch.value);
+  if (directCondition && !selectedConditionNames.includes(directCondition.name)) {
+    selectedConditionNames.push(directCondition.name);
+  }
+  const selectedConditions = selectedConditionNames.map(findConditionExact).filter(Boolean);
+  if (!selectedConditions.length) {
+    setDefaultState('No condition selected', 'Add one or more conditions from the searchable list, then run the tool. The output will show the baseline standards, higher-risk flags, documents to gather, and recruiter actions.');
     return;
   }
 
-  const facts = getActiveFacts();
-  const decision = computeDecision(condition, facts, recordsStatus.value, timeSince.value, activityLevel.value);
+  renderSelectedConditions();
 
-  document.getElementById('metricCondition').textContent = condition.name;
-  document.getElementById('metricCategory').textContent = condition.category;
-  document.getElementById('metricLane').textContent = decision.lane;
-  document.getElementById('metricPacket').textContent = decision.packet;
+  const facts = getActiveFacts();
+  const decisions = selectedConditions.map(condition => ({
+    condition,
+    decision: computeDecision(condition, facts, recordsStatus.value, timeSince.value, activityLevel.value)
+  }));
+
+  const highestScore = Math.max(...decisions.map(d => d.decision.score));
+  const overallDecision = decisions.sort((a,b) => b.decision.score - a.decision.score)[0].decision;
+  const categories = [...new Set(selectedConditions.map(c => c.category))];
+
+  document.getElementById('metricCondition').textContent = `${selectedConditions.length} selected`;
+  document.getElementById('metricCategory').textContent = categories.join(', ');
+  document.getElementById('metricLane').textContent = overallDecision.lane;
+  document.getElementById('metricPacket').textContent = selectedConditions.length > 1
+    ? 'Combined packet recommended'
+    : overallDecision.packet;
 
   const banner = document.getElementById('statusBanner');
-  banner.className = `status-banner ${decision.statusClass}`;
-  banner.innerHTML = `<div><h3>${decision.headline}</h3><p>${decision.message}</p></div>`;
+  banner.className = `status-banner ${overallDecision.statusClass}`;
+  banner.innerHTML = `<div><h3>${overallDecision.headline}</h3><p>${selectedConditions.length > 1 ? 'Multiple conditions are selected, so the tool is combining packet requirements and using the highest-risk posture among the selected conditions.' : overallDecision.message}</p></div>`;
 
-  document.getElementById('conditionTitle').textContent = condition.name;
-  document.getElementById('conditionTags').innerHTML = condition.tags.map(t => `<span class="inline-tag">${t}</span>`).join('');
-  document.getElementById('baselineText').textContent = condition.baseline;
+  document.getElementById('conditionTitle').textContent = selectedConditions.length > 1
+    ? 'Selected condition summaries'
+    : selectedConditions[0].name;
+  document.getElementById('conditionTags').innerHTML = [...new Set(selectedConditions.flatMap(c => c.tags))].map(t => `<span class="inline-tag">${t}</span>`).join('');
 
-  const docs = [...condition.docs];
+  document.getElementById('baselineText').innerHTML = decisions.map(({condition}) => `
+    <div class="condition-block">
+      <h4>${condition.name}</h4>
+      <div class="small"><strong>Category:</strong> ${condition.category}</div>
+      <div class="muted-box" style="margin-top:8px;">${condition.baseline}</div>
+    </div>
+  `).join('');
+
+  const docs = [...new Set(selectedConditions.flatMap(c => c.docs))];
   document.getElementById('docList').innerHTML = docs.map(d => `<li>${d}</li>`).join('');
 
-  const riskItems = [
-    ...condition.favorable.map(i => `Favorable posture: ${i}`),
-    ...condition.elevated.map(i => `Higher-risk flag: ${i}`)
-  ];
+  const riskItems = [...new Set(selectedConditions.flatMap(condition => [
+    ...condition.favorable.map(i => `Favorable posture - ${condition.name}: ${i}`),
+    ...condition.elevated.map(i => `Higher-risk flag - ${condition.name}: ${i}`)
+  ]))];
   document.getElementById('riskList').innerHTML = riskItems.map(i => `<li>${i}</li>`).join('');
 
-  const actions = [...condition.actions, ...decision.actionBoosters];
-  if (facts.includes('hospitalization')) actions.unshift('Hospitalization is marked - verify whether inpatient records or discharge paperwork must be added.');
-  if (facts.includes('currentSymptoms')) actions.unshift('Current symptoms are marked - expect closer review and make sure the packet explains present-day function clearly.');
+  let actions = [
+    ...selectedConditions.flatMap(c => c.actions.map(a => `${c.name}: ${a}`)),
+    ...decisions.flatMap(d => d.decision.actionBoosters)
+  ];
+  if (facts.includes('hospitalization')) actions.unshift('Hospitalization is marked - verify whether inpatient records or discharge paperwork must be added for every relevant condition.');
+  if (facts.includes('currentSymptoms')) actions.unshift('Current symptoms are marked - expect closer review and make sure the packet explains present-day function clearly for each selected condition.');
   document.getElementById('actionList').innerHTML = [...new Set(actions)].map(a => `<li>${a}</li>`).join('');
 
   document.getElementById('universalList').innerHTML = universalDocs.map(u => `<li>${u}</li>`).join('');
 
   const notes = recruiterNotes.value.trim();
+  const notePrefix = selectedConditions.length > 1 ? `<strong>Recruiter notes entered for combined review:</strong><br>` : `<strong>Recruiter notes entered:</strong><br>`;
   document.getElementById('customNotes').innerHTML = notes
-    ? `<strong>Recruiter notes entered:</strong><br>${notes.replace(/\n/g, '<br>')}`
+    ? `${notePrefix}${notes.replace(/\n/g, '<br>')}`
     : 'No applicant-specific notes added yet.';
-}
 
+  updatePrintHeader();
+  updatePrintHeader();
+  scheduleHeightRefresh();
+}
 function setDefaultState(title, text) {
   document.getElementById('metricCondition').textContent = title;
   document.getElementById('metricCategory').textContent = '-';
@@ -1106,34 +1483,45 @@ function setDefaultState(title, text) {
   banner.innerHTML = `<div><h3>${title}</h3><p>${text}</p></div>`;
   document.getElementById('conditionTitle').textContent = title;
   document.getElementById('conditionTags').innerHTML = '';
-  document.getElementById('baselineText').textContent = text;
+  document.getElementById('baselineText').innerHTML = `<div class="muted-box">${text}</div>`;
   document.getElementById('docList').innerHTML = '<li>Select a condition to populate this section.</li>';
   document.getElementById('riskList').innerHTML = '<li>Select a condition to populate this section.</li>';
   document.getElementById('actionList').innerHTML = '<li>Select a condition to populate this section.</li>';
   document.getElementById('universalList').innerHTML = universalDocs.map(u => `<li>${u}</li>`).join('');
   document.getElementById('customNotes').textContent = 'No applicant-specific notes added yet.';
+  updatePrintHeader();
+  scheduleHeightRefresh();
 }
 
 function resetAll() {
   document.getElementById('applicantName').value = '';
   conditionSearch.value = '';
+  selectedConditionNames = [];
+  renderSelectedConditions();
   recordsStatus.value = 'none';
   timeSince.value = 'unknown';
   activityLevel.value = 'unknown';
   recruiterNotes.value = '';
   factChips.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-  setDefaultState('Ready for condition review', 'Select a condition and recruiter facts, then run the tool. The output will show the baseline standard, higher-risk flags, what documents to gather, and next recruiter actions.');
+  setDefaultState('Ready for condition review', 'Add one or more conditions, then run the tool. The output will show the baseline standards, higher-risk flags, what documents to gather, and next recruiter actions.');
 }
 
 buildCategories();
 buildFactChips();
 renderConditionList();
-setDefaultState('Ready for condition review', 'Select a condition and recruiter facts, then run the tool. The output will show the baseline standard, higher-risk flags, what documents to gather, and next recruiter actions.');
+renderSelectedConditions();
+setDefaultState('Ready for condition review', 'Add one or more conditions, then run the tool. The output will show the baseline standards, higher-risk flags, what documents to gather, and next recruiter actions.');
+initCollapsibles();
+watchExpandedContent();
+updatePrintHeader();
+scheduleHeightRefresh();
 
-categoryFilter.addEventListener('change', renderConditionList);
+categoryFilter.addEventListener('change', () => { renderConditionList(); conditionSearch.value = ''; const cat = categoryFilter.value; conditionSearch.placeholder = cat && cat !== 'All categories' ? `Search ${cat.toLowerCase()} condition...` : 'Pick a category, then search or type a condition...'; });
+document.getElementById('addConditionBtn').addEventListener('click', addConditionSelection);
 document.getElementById('runBtn').addEventListener('click', renderDecision);
 document.getElementById('resetBtn').addEventListener('click', resetAll);
-conditionSearch.addEventListener('keydown', e => { if (e.key === 'Enter') renderDecision(); });
+document.getElementById('printBtn').addEventListener('click', () => { updatePrintHeader(); refreshExpandedHeights(); window.print(); });
+conditionSearch.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addConditionSelection(); } });
 </script>
 </body>
 </html>
