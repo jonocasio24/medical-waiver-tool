@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Medical Waiver Decision Support Tool</title>
+  <style>
+    :root {
+      --bg: #eef6f7;
+      --panel: #ffffff;
+      --ink: #17343c;
+      --muted: #5d7680;
+      --line: #d8e8ec;
+      --navy: #0f3c4b;
+      --teal: #167c80;
+      --teal-2: #1f9da0;
+      --blue: #dff5f7;
+      --green: #e8f7ef;
+      --green-ink: #1f6a44;
+      --amber: #fff5df;
+      --amber-ink: #926100;
+      --red: #fff0ef;
+      --red-ink: #9a342d;
+      --shadow: 0 18px 45px rgba(15, 60, 75, 0.12);
+      --radius: 20px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; font-family: Inter, Arial, Helvetica, sans-serif; background: linear-gradient(180deg, #f4fbfc 0%, #eef6f7 100%); color: var(--ink); }
+    body { padding: 18px; }
+    .app { max-width: 1280px; margin: 0 auto; }
+    .hero {
+      background: linear-gradient(135deg, #0f3c4b 0%, #167c80 55%, #29aeb0 100%);
+      color: white;
+      border-radius: 28px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 18px;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -40px -60px auto;
+      width: 220px;
+      height: 220px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      box-shadow: -90px -30px 0 0 rgba(255,255,255,0.05);
+    }
+    .hero h1 { margin: 0 0 8px; font-size: clamp(1.7rem, 3vw, 2.5rem); letter-spacing: 0.2px; }
+    .hero p { margin: 0; max-width: 850px; line-height: 1.45; color: rgba(255,255,255,0.92); }
+    .hero-badges { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    .hero-badge {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.16);
+      font-size: 0.9rem;
+    }
+
+    .layout { display: grid; grid-template-columns: 390px 1fr; gap: 18px; }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: 0 10px 26px rgba(15, 60, 75, 0.06);
+    }
+    .panel-inner { padding: 18px; }
+    .panel h2, .panel h3 { margin: 0 0 12px; }
+    .section-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: var(--blue);
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 0.84rem;
+      margin-bottom: 14px;
+    }
+    .field-grid { display: grid; gap: 12px; }
+    .field { display: grid; gap: 7px; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 680px) { .field-row { grid-template-columns: 1fr; } }
+    label { font-weight: 700; font-size: 0.92rem; color: var(--ink); }
+    input[type="text"], input[type="number"], select, textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #c9dde2;
+      border-radius: 14px;
+      font-size: 0.96rem;
+      background: #fcfefe;
+      color: var(--ink);
+      outline: none;
+    }
+    textarea { min-height: 88px; resize: vertical; }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--teal-2);
+      box-shadow: 0 0 0 3px rgba(31, 157, 160, 0.14);
+    }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      border: 1px solid #cde2e6;
+      background: #f8fcfd;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 8px 11px;
+      font-size: 0.87rem;
+      cursor: pointer;
+      user-select: none;
+      transition: 0.16s ease;
+    }
+    .chip.active { background: var(--blue); border-color: #9fd8dd; color: var(--navy); font-weight: 700; }
+
+    .btn-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+    button {
+      border: none;
+      cursor: pointer;
+      font-weight: 800;
+      padding: 12px 16px;
+      border-radius: 14px;
+      font-size: 0.95rem;
+      transition: 0.18s ease;
+    }
+    .btn-primary { background: linear-gradient(135deg, #0f3c4b, #167c80); color: white; box-shadow: 0 12px 26px rgba(15, 60, 75, 0.18); }
+    .btn-secondary { background: #e9f5f6; color: var(--navy); }
+    button:hover { transform: translateY(-1px); }
+
+    .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+    @media (max-width: 1100px) { .summary-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 680px) { .summary-grid { grid-template-columns: 1fr; } }
+    .metric {
+      background: #f8fcfd;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+    }
+    .metric .kicker { font-size: 0.76rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+    .metric .value { font-size: 1.08rem; font-weight: 800; margin-top: 8px; line-height: 1.25; }
+
+    .status-banner {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 18px;
+      border-radius: 18px;
+      border: 1px solid transparent;
+      margin-bottom: 16px;
+    }
+    .status-banner h3 { margin: 0 0 4px; font-size: 1.15rem; }
+    .status-banner p { margin: 0; color: inherit; line-height: 1.45; }
+    .status-high { background: var(--red); color: var(--red-ink); border-color: #f4c9c4; }
+    .status-mid { background: var(--amber); color: var(--amber-ink); border-color: #efd69b; }
+    .status-low { background: var(--green); color: var(--green-ink); border-color: #bfe4cc; }
+    .status-info { background: var(--blue); color: var(--navy); border-color: #b7dfe4; }
+
+    .two-col { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 16px; }
+    @media (max-width: 980px) { .two-col { grid-template-columns: 1fr; } }
+    .card {
+      border: 1px solid var(--line);
+      background: #fcfefe;
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .card h3 { font-size: 1rem; margin-bottom: 12px; }
+    ul { padding-left: 20px; margin: 8px 0 0; }
+    li { margin: 6px 0; line-height: 1.42; }
+    .small { color: var(--muted); font-size: 0.9rem; line-height: 1.45; }
+    .inline-tag {
+      display: inline-block;
+      background: #edf7f8;
+      border: 1px solid #cae6e8;
+      color: var(--navy);
+      font-weight: 700;
+      padding: 6px 10px;
+      border-radius: 999px;
+      margin: 0 8px 8px 0;
+      font-size: 0.82rem;
+    }
+    .condition-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .condition-title { font-size: 1.35rem; font-weight: 900; margin: 0; }
+    .muted-box {
+      border-left: 4px solid #7bc8cb;
+      background: #f4fbfc;
+      padding: 13px 14px;
+      border-radius: 14px;
+      margin-top: 10px;
+      line-height: 1.45;
+    }
+    .footer-note { margin-top: 14px; font-size: 0.88rem; color: var(--muted); line-height: 1.45; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <section class="hero">
+      <h1>Medical Waiver Decision Support Tool</h1>
+      <p>Recruiter-facing decision support built from DoDI 6130.03 baseline disqualification standards, FY25 Waiver Risk Guidance, and Medical Waiver TTP packet requirements. Use it to identify likely packet needs, flag higher-risk facts, and generate a cleaner recruiter action plan.</p>
+      <div class="hero-badges">
+        <div class="hero-badge">Mobile-friendly medical layout</div>
+        <div class="hero-badge">Condition in -> packet guidance out</div>
+        <div class="hero-badge">Universal TTP checklist included</div>
+      </div>
+    </section>
+
+    <div class="layout">
+      <aside class="panel">
+        <div class="panel-inner">
+          <div class="section-label">Recruiter Inputs</div>
+
+          <div class="field-grid">
+            <div class="field-row">
+              <div class="field">
+                <label for="applicantName">Applicant name</label>
+                <input id="applicantName" type="text" placeholder="Optional" />
+              </div>
+              <div class="field">
+                <label for="conditionSearch">Condition</label>
+                <input id="conditionSearch" list="conditionList" placeholder="Search condition..." />
+                <datalist id="conditionList"></datalist>
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="categoryFilter">Category</label>
+                <select id="categoryFilter"></select>
+              </div>
+              <div class="field">
+                <label for="recordsStatus">Records in hand</label>
+                <select id="recordsStatus">
+                  <option value="none">No records yet</option>
+                  <option value="partial">Partial records</option>
+                  <option value="complete">Most records in hand</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Current/recent facts</label>
+              <div class="chips" id="factChips"></div>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="timeSince">Time since last symptoms/treatment</label>
+                <select id="timeSince">
+                  <option value="unknown">Unknown</option>
+                  <option value="current">Current / active now</option>
+                  <option value="lt6">Less than 6 months</option>
+                  <option value="m6to12">6-12 months</option>
+                  <option value="y1to2">1-2 years</option>
+                  <option value="y2to3">2-3 years</option>
+                  <option value="gt3">More than 3 years</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="activityLevel">Current physical function</label>
+                <select id="activityLevel">
+                  <option value="unknown">Unknown</option>
+                  <option value="full">Full activity / sports / gym</option>
+                  <option value="moderate">Some activity, minor limits</option>
+                  <option value="limited">Limited activity or pain</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="recruiterNotes">Recruiter notes</label>
+              <textarea id="recruiterNotes" placeholder="Optional facts you want shown in the action summary..."></textarea>
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn-primary" id="runBtn">Generate Decision</button>
+            <button class="btn-secondary" id="resetBtn">Reset</button>
+          </div>
+
+          <div class="footer-note">
+            This tool is a decision-support aid. It does not replace MEPS, the approving medical authority, or official waiver routing. Use it to tighten packet prep and record collection.
+          </div>
+        </div>
+      </aside>
+
+      <main class="panel">
+        <div class="panel-inner">
+          <div class="section-label">Decision Output</div>
+
+          <div class="summary-grid">
+            <div class="metric"><div class="kicker">Selected condition</div><div class="value" id="metricCondition">Choose a condition</div></div>
+            <div class="metric"><div class="kicker">Category</div><div class="value" id="metricCategory">-</div></div>
+            <div class="metric"><div class="kicker">Likely lane</div><div class="value" id="metricLane">-</div></div>
+            <div class="metric"><div class="kicker">Packet posture</div><div class="value" id="metricPacket">-</div></div>
+          </div>
+
+          <div id="statusBanner" class="status-banner status-info">
+            <div>
+              <h3>Ready for condition review</h3>
+              <p>Select a condition and recruiter facts, then run the tool. The output will show the baseline standard, higher-risk flags, what documents to gather, and next recruiter actions.</p>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div>
+              <div class="card">
+                <div class="condition-head">
+                  <h2 class="condition-title" id="conditionTitle">No condition selected</h2>
+                </div>
+                <div id="conditionTags"></div>
+                <div class="muted-box" id="baselineText">The condition summary and baseline disqualification standard will appear here.</div>
+              </div>
+
+              <div class="card">
+                <h3>Required submission items</h3>
+                <ul id="docList"></ul>
+              </div>
+
+              <div class="card">
+                <h3>Recruiter action steps</h3>
+                <ul id="actionList"></ul>
+              </div>
+            </div>
+
+            <div>
+              <div class="card">
+                <h3>Risk guidance</h3>
+                <ul id="riskList"></ul>
+              </div>
+
+              <div class="card">
+                <h3>Universal medical waiver packet items</h3>
+                <ul id="universalList"></ul>
+              </div>
+
+              <div class="card">
+                <h3>Applicant-specific notes</h3>
+                <div id="customNotes" class="small">No applicant-specific notes added yet.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="footer-note">
+            Source basis embedded in this version: DoDI 6130.03 medical entrance standards, FY25 Waiver Risk Guidance condition-specific submission notes, and Medical Waiver TTP packet requirements.
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+<script>
+const universalDocs = [
+  "Applicant's current MEPS medical examination (MHS-Genesis Summary Report or DD 2808) with no open profiles.",
+  "DD Form 2807-2.",
+  "Medical records related to the disqualifying condition.",
+  "Consults tied to the condition.",
+  "DD214, NGB 22, and all separation/discharge documents from any component, when prior service applies.",
+  "REDD, when prior service applies.",
+  "If separated for medical reasons: DA Form 4707, DA Form 3947, and/or DA Form 199, as applicable."
+];
+
+const allFacts = [
+  { id: "currentSymptoms", label: "Current symptoms" },
+  { id: "recentTreatment", label: "Recent treatment / meds" },
+  { id: "hospitalization", label: "Hospitalization history" },
+  { id: "surgery", label: "Surgery / procedure history" },
+  { id: "activityLimits", label: "Activity limitation" },
+  { id: "recurrence", label: "Recurrence history" },
+  { id: "pharmacyReady", label: "Pharmacy report available" },
+  { id: "specialistReady", label: "Specialist records available" },
+  { id: "stableOffMeds", label: "Stable off meds" },
+  { id: "physicallyActive", label: "Physically active now" },
+  { id: "recentTesting", label: "Recent testing / imaging available" },
+  { id: "lettersSupport", label: "Support letters available" }
+];
+
+const conditions = [
+  {
+    name: "ADHD",
+    category: "Behavioral Health",
+    aliases: ["attention deficit", "stimulant", "f90"],
+    baseline: "DoDI 6130.03 flags ADHD when there was an IEP/504 or work accommodations after age 14, comorbid mental disorders, medication in the previous 24 months, or adverse academic/occupational performance.",
+    tags: ["DoDI 6.28.a", "BH", "Medication timeline matters"],
+    docs: [
+      "Associated clinical encounters / notes.",
+      "Pharmacy report over the last 3 years.",
+      "Applicant statement explaining symptoms, treatment history, school/work performance, and current functioning.",
+      "IEP / 504 / accommodation documents if they exist.",
+      "Support letters from employer/educator showing stability off medication when available."
+    ],
+    favorable: [
+      "Stronger posture when the applicant is stable off stimulant medication and functioning well in school/work.",
+      "Lower-risk lane improves when there is no recent treatment and no documented functional impairment."
+    ],
+    elevated: [
+      "Recent stimulant use, comorbid BH history, IEP/504 after age 14, or adverse performance make the case more waiver-intensive.",
+      "Missing school/work-function information usually slows the packet."
+    ],
+    actions: [
+      "Build a clean timeline: diagnosis, last medication date, school/work impact, and current performance.",
+      "Collect pharmacy history early.",
+      "If accommodations existed, get the records now so the packet is complete on first pass."
+    ],
+    lane: "Likely waiver review if standard is triggered"
+  },
+  {
+    name: "Autism spectrum disorder",
+    category: "Behavioral Health",
+    aliases: ["autism", "asd", "f84"],
+    baseline: "DoDI 6130.03 lists autism spectrum disorders as disqualifying for accession review.",
+    tags: ["DoDI 6.28.c", "BH", "Functional evidence important"],
+    docs: [
+      "IEP if applicable.",
+      "Associated clinical encounters / notes.",
+      "Pharmacy report over the last 3 years.",
+      "Applicant statement endorsing teamwork, extracurricular activity, and/or job performance."
+    ],
+    favorable: [
+      "Evidence of work, team participation, and functional independence helps frame the packet.",
+      "No active medication or recent treatment tends to strengthen posture."
+    ],
+    elevated: [
+      "Functional impairment, recent treatment, or incomplete school records usually make the case harder to assess.",
+      "Recruiter should expect closer review when daily living or social function concerns remain current."
+    ],
+    actions: [
+      "Get the educational and clinical record set up front.",
+      "Use the applicant statement to show current functioning in work, school, sports, or team settings."
+    ],
+    lane: "Waiver review likely"
+  },
+  {
+    name: "Depressive disorder",
+    category: "Behavioral Health",
+    aliases: ["depression", "f32"],
+    baseline: "DoDI 6130.03 flags depressive disorder when counseling exceeded 12 cumulative months, symptoms or treatment occurred within the previous 36 months, there was inpatient treatment, recurrence, or suicidality.",
+    tags: ["DoDI 6.28.f", "BH", "36-month lookback"],
+    docs: [
+      "Associated clinical encounters / notes.",
+      "Pharmacy report over the last 3 years.",
+      "Applicant statement explaining what led to the diagnosis and how the applicant has coped/overcome it.",
+      "Support letters from employers/educators showing 1-2 years of stability off medication when available."
+    ],
+    favorable: [
+      "Longer stability off medication with solid work/school function helps.",
+      "No inpatient care, no recurrence, and no suicidality are key favorable points."
+    ],
+    elevated: [
+      "Any suicidality, inpatient treatment, recurrence, or recent symptoms/treatment significantly increases risk.",
+      "Incomplete therapy notes or pharmacy history create avoidable delays."
+    ],
+    actions: [
+      "Do not submit a thin packet. Gather timeline, records, and pharmacy history together.",
+      "Use support letters if the applicant has stable employment or school performance."
+    ],
+    lane: "Waiver review likely"
+  },
+  {
+    name: "Anxiety disorder",
+    category: "Behavioral Health",
+    aliases: ["anxiety", "panic", "f41"],
+    baseline: "DoDI 6130.03 flags anxiety disorders when counseling exceeded 12 cumulative months, symptoms/treatment occurred within the previous 36 months, there was inpatient treatment, recurrence, or suicidality.",
+    tags: ["DoDI 6.28.q", "BH"],
+    docs: [
+      "Associated clinical encounters / notes.",
+      "Pharmacy report over the last 3 years.",
+      "Applicant statement explaining what led to the diagnosis and how the applicant has coped/overcome it.",
+      "Support letters showing stable performance off medication when available."
+    ],
+    favorable: [
+      "Strong stability off medication and good occupational/academic function help.",
+      "Short treatment history with no recurrence is more favorable than chronic care."
+    ],
+    elevated: [
+      "Recent panic symptoms, psychotropic medication, or recurrence push the case toward higher-risk review.",
+      "Any suicidality is a major escalator."
+    ],
+    actions: [
+      "Get therapy notes, pharmacy report, and a clear symptom timeline before submission."
+    ],
+    lane: "Waiver review likely"
+  },
+  {
+    name: "Adjustment disorder",
+    category: "Behavioral Health",
+    aliases: ["adjustment", "f43.2"],
+    baseline: "DoDI 6130.03 flags a single adjustment disorder if treated or symptomatic within the previous 6 months, and any chronic or recurrent episodes are disqualifying for accession review.",
+    tags: ["DoDI 6.28.g", "BH", "6-month threshold"],
+    docs: [
+      "Associated clinical encounters / notes.",
+      "Pharmacy report over the last 3 years.",
+      "Applicant statement explaining trigger events and current coping / recovery."
+    ],
+    favorable: [
+      "Older, clearly resolved situational cases are better than chronic or recurrent ones.",
+      "No current symptoms and good functioning improve the packet."
+    ],
+    elevated: [
+      "Recent treatment, repeat episodes, or lingering functional issues increase the risk profile."
+    ],
+    actions: [
+      "Explain the stressor, the treatment course, and why the issue is resolved now."
+    ],
+    lane: "May be lower-risk if clearly resolved"
+  },
+  {
+    name: "PTSD",
+    category: "Behavioral Health",
+    aliases: ["post traumatic stress", "f43.10"],
+    baseline: "DoDI 6130.03 lists trauma and stressor-related disorders, including PTSD, as disqualifying conditions for accession review.",
+    tags: ["DoDI 6.28.p", "BH"],
+    docs: [
+      "Associated clinical encounters / notes.",
+      "Pharmacy report over the last 3 years.",
+      "Applicant statement explaining events, recovery, coping, and present-day function.",
+      "Support letters when available to show stability."
+    ],
+    favorable: [
+      "Long stability with no medication and no symptom recurrence helps.",
+      "Current school/work reliability should be documented."
+    ],
+    elevated: [
+      "Recent therapy, medication, sleep disturbance, avoidance, or other active symptoms make this a higher-risk packet.",
+      "Inpatient care or other BH comorbidity increases scrutiny."
+    ],
+    actions: [
+      "Expect detailed record review; gather the full BH history before submission."
+    ],
+    lane: "Higher-risk waiver review"
+  },
+  {
+    name: "Self-harm / suicidality",
+    category: "Behavioral Health",
+    aliases: ["self harm", "suicide", "ideation", "gesture"],
+    baseline: "DoDI 6130.03 flags suicide attempts, gestures, ideation with a plan, any ideation within the previous 12 months, and endorsed or clinically suspected self-harm as disqualifying.",
+    tags: ["DoDI 6.28.m/n", "BH", "High-risk"],
+    docs: [
+      "Associated clinical encounters / notes.",
+      "Pharmacy report over the last 3 years.",
+      "Applicant statement explaining the events, treatment, and recovery.",
+      "Any discharge paperwork or inpatient records if hospitalization occurred."
+    ],
+    favorable: [
+      "Only strong, well-documented long-term stability supports a better packet posture."
+    ],
+    elevated: [
+      "This is a high-risk review area by default.",
+      "Recent ideation, hospitalization, or ongoing treatment are major escalation points."
+    ],
+    actions: [
+      "Gather the complete record set before trying to submit.",
+      "Do not rely on a short applicant statement alone."
+    ],
+    lane: "High-risk waiver review"
+  },
+  {
+    name: "Psychotropic prescription history",
+    category: "Behavioral Health",
+    aliases: ["psychotropic", "antidepressant", "stimulant", "mood stabilizer"],
+    baseline: "DoDI 6130.03 flags psychotropic prescription history within the previous 36 months unless another standard authorizes a shorter period.",
+    tags: ["DoDI 6.28.w", "BH", "Medication-driven trigger"],
+    docs: [
+      "Associated clinical encounters / notes.",
+      "Pharmacy report over the last 3 years.",
+      "Applicant statement explaining why medication was used and current status off medication if applicable."
+    ],
+    favorable: [
+      "A clean explanation, short course, and stable functioning after discontinuation improve the packet."
+    ],
+    elevated: [
+      "Recent fills or unclear diagnosis history will likely generate more scrutiny."
+    ],
+    actions: [
+      "Match pharmacy dates to provider notes so the timeline is consistent."
+    ],
+    lane: "Needs careful timeline review"
+  },
+  {
+    name: "Asthma / reactive airway disease",
+    category: "Pulmonology",
+    aliases: ["asthma", "reactive airway", "exercise induced", "albuterol"],
+    baseline: "DoDI 6130.03 disqualifies a history of airway hyper-responsiveness including asthma, reactive airway disease, exercise-induced bronchospasm, or asthmatic bronchitis after the 13th birthday.",
+    tags: ["DoDI 6.13", "Pulmonology", "Age 13 trigger"],
+    docs: [
+      "Applicant statement endorsing sports participated in during high school and current fitness regimen.",
+      "Pharmacy records over the last 5 years.",
+      "Associated clinical encounters / notes if available."
+    ],
+    favorable: [
+      "FY25 guidance is more favorable when the applicant is a proven high school athlete or clearly demonstrates aerobic/endurance activity.",
+      "No more than 2 albuterol fills in the last 5 years and no oral steroid use in 5 years supports a lower-risk lane."
+    ],
+    elevated: [
+      "Current symptoms, repeated rescue inhaler use, oral steroid history, or weak exercise tolerance increase risk.",
+      "Missing pharmacy history makes the case hard to posture."
+    ],
+    actions: [
+      "Get the pharmacy report first.",
+      "Use the applicant statement to show current fitness and sports participation."
+    ],
+    lane: "Often waiver review; packet strength depends heavily on pharmacy and activity history"
+  },
+  {
+    name: "Obstructive sleep apnea",
+    category: "Pulmonology",
+    aliases: ["sleep apnea", "cpap", "apap", "ahi"],
+    baseline: "DoDI 6130.03 flags sleep-related breathing disorders including sleep apnea unless definitively treated by surgical intervention with symptom resolution.",
+    tags: ["DoDI 6.27", "Pulmonology"],
+    docs: [
+      "Associated clinical encounters / notes.",
+      "Most recent polysomnography / sleep study.",
+      "If using APAP/CPAP, compliance report showing at least 4 hours per night for over 70% of nights during a 30-day period when applicable."
+    ],
+    favorable: [
+      "FY25 guidance is more favorable for asymptomatic mild OSA or successfully managed mild-to-moderate OSA with documented compliance."
+    ],
+    elevated: [
+      "No sleep study, poor compliance, or ongoing symptoms increase risk."
+    ],
+    actions: [
+      "Sleep study + current provider notes should be in the packet from the start."
+    ],
+    lane: "Needs study-based review"
+  },
+  {
+    name: "Spontaneous pneumothorax",
+    category: "Pulmonology",
+    aliases: ["pneumothorax", "collapsed lung"],
+    baseline: "Pulmonary history with pneumothorax may require waiver review depending on timing and correction.",
+    tags: ["Pulmonology", "Timing-sensitive"],
+    docs: ["Associated clinical encounters / notes."],
+    favorable: ["FY25 guidance is more favorable if the case is more than 10 years old or was surgically corrected more than 6 months ago."],
+    elevated: ["Recent cases or unresolved functional limitations increase risk."],
+    actions: ["Document the event date, treatment, and whether there are any residual issues."],
+    lane: "Timing-sensitive waiver review"
+  },
+  {
+    name: "Latent tuberculosis",
+    category: "Pulmonology",
+    aliases: ["tb", "latent tb"],
+    baseline: "Pulmonary infectious history may need waiver review depending on treatment status and current imaging.",
+    tags: ["Pulmonology"],
+    docs: [
+      "Associated clinical encounters / notes.",
+      "Chest CT or X-ray within the past year.",
+      "Documentation of treatment."
+    ],
+    favorable: ["Appropriate documentation of completed treatment supports a lower-risk lane."],
+    elevated: ["Missing treatment proof or no recent imaging weakens the packet."],
+    actions: ["Get treatment documentation and recent imaging before submission."],
+    lane: "Usually records-driven review"
+  },
+  {
+    name: "Pulmonary embolus / DVT",
+    category: "Pulmonology",
+    aliases: ["embolus", "pulmonary embolism", "dvt"],
+    baseline: "Thromboembolic history usually requires a careful records-based review.",
+    tags: ["Pulmonology/Cardiology", "Provoked vs unprovoked matters"],
+    docs: [
+      "Associated clinical encounters / notes.",
+      "Pharmacy records for the last 1 year.",
+      "Narrative showing whether the event was clearly provoked (surgery, trauma, etc.)."
+    ],
+    favorable: ["FY25 guidance is more favorable for a single clearly provoked event with at least 6 months off anticoagulants."],
+    elevated: ["Unprovoked, recurrent, or still-treated cases are higher-risk."],
+    actions: ["Make the causation and anticoagulant timeline very clear."],
+    lane: "Can range from moderate to high risk"
+  },
+  {
+    name: "Eczema / dermatitis",
+    category: "Dermatology",
+    aliases: ["eczema", "dermatitis", "atopic"],
+    baseline: "DoDI 6130.03 flags recurrent or chronic dermatitis in the previous 24 months when treatment required more than over-the-counter medication.",
+    tags: ["DoDI 6.23", "Dermatology"],
+    docs: [
+      "Pharmacy records dating back at least 1 year.",
+      "Applicant statement covering current treatment plan and any restriction of daily activities.",
+      "Focused exam details if lesions or residual areas are present."
+    ],
+    favorable: ["FY25 guidance is more favorable when there are no active lesions or residual hyperpigmented areas on focused exam."],
+    elevated: ["Current lesions, prescription dependence, or daily-activity restriction increase risk."],
+    actions: ["Get pharmacy history and document current skin status clearly."],
+    lane: "May be lower-risk when inactive"
+  },
+  {
+    name: "Psoriasis",
+    category: "Dermatology",
+    aliases: ["psoriasis"],
+    baseline: "DoDI 6130.03 lists psoriasis, excluding non-recurrent childhood guttate psoriasis, as disqualifying.",
+    tags: ["DoDI 6.23.o", "Dermatology"],
+    docs: [
+      "Pharmacy records dating back at least 1 year.",
+      "Applicant statement covering current treatment plan and restrictions of daily activity."
+    ],
+    favorable: ["More favorable when there are no active lesions or residual areas on focused exam."],
+    elevated: ["Active disease or equipment-wear issues increase risk."],
+    actions: ["Use the statement to document function, treatment, and lesion status."],
+    lane: "Waiver review likely"
+  },
+  {
+    name: "Acne / Accutane history",
+    category: "Dermatology",
+    aliases: ["acne", "accutane", "isotretinoin"],
+    baseline: "Dermatologic severity matters when the condition may interfere with wear of military equipment or when treatment is current.",
+    tags: ["Dermatology"],
+    docs: [
+      "Applicant statement with last use of Accutane if ever used.",
+      "Letter from the prescribing doctor endorsing the last use date when Accutane was used.",
+      "2808 description of extent if the condition is visible / extensive."
+    ],
+    favorable: ["FY25 guidance is more favorable when acne will not interfere with military equipment and the applicant has been off Accutane for more than 4 weeks."],
+    elevated: ["Current Accutane treatment or severe equipment-interfering disease increases concern."],
+    actions: ["Clarify last Accutane date early."],
+    lane: "Usually straightforward if inactive"
+  },
+  {
+    name: "Shoulder stiffness",
+    category: "Orthopedics",
+    aliases: ["shoulder", "rom shoulder"],
+    baseline: "DoDI 6130.03 sets accession minimums for upper-extremity range of motion; significant limitation can be disqualifying.",
+    tags: ["DoDI 6.17", "Orthopedics", "ROM-based"],
+    docs: ["Most recent range-of-motion measurements by a clinician.", "Applicant exercise statement is helpful."],
+    favorable: ["FY25 guidance is more favorable when documented ROM reaches at least 90 degrees flexion or abduction, 45 degrees external rotation, and 60 degrees internal rotation."],
+    elevated: ["Persistent pain, activity limitation, or incomplete ROM documentation increase risk."],
+    actions: ["Use current ROM measurements, not old notes."],
+    lane: "ROM-driven review"
+  },
+  {
+    name: "Knee stiffness",
+    category: "Orthopedics",
+    aliases: ["knee", "rom knee"],
+    baseline: "Lower-extremity function and ROM shortfalls can trigger accession concerns.",
+    tags: ["Orthopedics", "ROM-based"],
+    docs: ["Most recent range-of-motion measurements by a clinician.", "Applicant exercise statement."],
+    favorable: ["FY25 guidance is more favorable when ROM reaches at least 90 degrees flexion and 15 degrees extension."],
+    elevated: ["Current pain, recurrent swelling, or poor activity tolerance increase risk."],
+    actions: ["Document current function, not just the injury history."],
+    lane: "ROM-driven review"
+  },
+  {
+    name: "Pes planus",
+    category: "Orthopedics",
+    aliases: ["flat feet", "pes planus"],
+    baseline: "Foot conditions become more important when they affect function or wear of military footwear.",
+    tags: ["Orthopedics", "Footwear tolerance matters"],
+    docs: ["Applicant statement outlining participation in sports or physical activity."],
+    favorable: ["FY25 guidance is more favorable when there is no impact from wearing military footwear."],
+    elevated: ["Pain, orthotic dependence, or inability to tolerate boots increase risk."],
+    actions: ["Use the statement to document running, sports, rucking, or gym activity."],
+    lane: "Often lower-risk if asymptomatic"
+  },
+  {
+    name: "Plantar fasciitis",
+    category: "Orthopedics",
+    aliases: ["plantar fasciitis"],
+    baseline: "Foot pain conditions require function-focused review when they limit activity or remain active.",
+    tags: ["Orthopedics", "Resolution before ship may matter"],
+    docs: ["Applicant exercise statement.", "Records showing treatment and resolution when available."],
+    favorable: ["FY25 guidance is more favorable when treatment is documented and the condition is resolved."],
+    elevated: ["Active pain or unresolved symptoms may delay ship readiness."],
+    actions: ["Document whether the applicant can run, train, and wear boots now."],
+    lane: "Often moderate if active, lower-risk if resolved"
+  },
+  {
+    name: "Low back pain / external support history",
+    category: "Orthopedics (Spine)",
+    aliases: ["back pain", "lumbar", "brace", "external support"],
+    baseline: "DoDI 6130.03 flags spine conditions in the previous 24 months or recurrent symptoms when they required external support or otherwise limited function.",
+    tags: ["DoDI 6.16", "Spine", "24-month / recurrence sensitive"],
+    docs: [
+      "Applicant exercise statement.",
+      "Pharmacy report over the last 2 years."
+    ],
+    favorable: ["FY25 guidance is more favorable when the history is older than 12 months or medication was limited to NSAIDs / acetaminophen."],
+    elevated: ["Recurrent symptoms, stronger medications, or current activity limits increase risk."],
+    actions: ["Build a medication timeline and show current physical activity."],
+    lane: "Timing-sensitive review"
+  },
+  {
+    name: "Scoliosis / spinal curvature",
+    category: "Orthopedics (Spine)",
+    aliases: ["scoliosis", "kyphosis", "curve"],
+    baseline: "DoDI 6130.03 flags spinal curvature when symptomatic within the previous 24 months or when measurements exceed accession thresholds.",
+    tags: ["DoDI 6.16.c", "Spine", "Imaging matters"],
+    docs: ["Applicant exercise statement.", "Most recent imaging studies (X-rays)."],
+    favorable: ["FY25 guidance is more favorable if asymptomatic for more than 12 months and physically active."],
+    elevated: ["Recent symptoms, high Cobb measurements, or equipment-wear issues increase risk."],
+    actions: ["Use current imaging rather than old school records when possible."],
+    lane: "Needs imaging-based review"
+  },
+  {
+    name: "Orthopedic hardware / implants",
+    category: "Orthopedics",
+    aliases: ["hardware", "implant", "anchor", "plate", "screws"],
+    baseline: "Retained hardware cases need a function-based review for pain, healed fractures, stability, and activity limitations.",
+    tags: ["Orthopedics", "Function + healing matter"],
+    docs: ["Applicant exercise statement.", "Associated clinical encounters / notes."],
+    favorable: ["FY25 guidance is more favorable with retained anchor/hardware when fractures are healed, ligaments are stable, and there is no pain."],
+    elevated: ["Pain, nonunion, instability, or hardware problems increase risk."],
+    actions: ["Make sure the notes clearly say healed / stable / no pain if true."],
+    lane: "Records-driven orthopedic review"
+  },
+  {
+    name: "Headaches / migraines",
+    category: "Neurologic",
+    aliases: ["headache", "migraine"],
+    baseline: "Neurologic headache history becomes more concerning when it causes significant missed activity or requires stronger medication patterns.",
+    tags: ["Neurologic", "Function + medication pattern"],
+    docs: [
+      "Applicant statement listing headaches per month and days missed per month over the last year.",
+      "Pharmacy report for headache medications over the last year."
+    ],
+    favorable: ["FY25 guidance is more favorable when the applicant has not missed work, school, sports, or other activities more than 8 times in 12 months and only uses OTC / low-toxicity / therapy-only medications."],
+    elevated: ["Frequent missed activity or stronger medication use raises risk."],
+    actions: ["Quantify frequency and missed time; vague statements are weak."],
+    lane: "Can be lower-risk with good function"
+  },
+  {
+    name: "Mild traumatic brain injury / concussion",
+    category: "Neurologic",
+    aliases: ["mild brain injury", "concussion", "tbi"],
+    baseline: "DoDI 6130.03 flags mild brain injury when it occurred within the previous month, has residual symptoms/limitations, occurred twice within 12 months, or there were three or more episodes; persistent post-concussive symptoms over 1 month are also flagged.",
+    tags: ["DoDI 6.26", "Neurologic", "Residual symptoms matter"],
+    docs: [
+      "Applicant statement covering the concussion timeline, loss of consciousness if any, and current symptoms over the last 6 months.",
+      "Associated clinical encounters / notes."
+    ],
+    favorable: ["FY25 guidance is more favorable when there are no residual symptoms and no LOC evidence in the past 6 months.", "Applicant cannot ship to basic training less than 4 weeks from the incident."],
+    elevated: ["Residual symptoms, repeat episodes, or recent events increase risk."],
+    actions: ["Document symptom-free status very clearly."],
+    lane: "Timing and symptom-sensitive review"
+  },
+  {
+    name: "Post-traumatic seizures",
+    category: "Neurologic",
+    aliases: ["seizure", "post traumatic seizure"],
+    baseline: "DoDI 6130.03 flags traumatic seizure after the 6th birthday unless the applicant has been seizure-free and off seizure medication for 60 months with normal follow-up testing; FY25 guidance gives a narrower post-traumatic seizure screen lane.",
+    tags: ["DoDI 6.26.p", "Neurologic", "High documentation need"],
+    docs: [
+      "Associated clinical encounters / notes.",
+      "Applicant statement describing seizure activity, last seizure date, number of seizures in the last 12 months, and medications used for seizure control."
+    ],
+    favorable: ["FY25 guidance is more favorable when seizures lasted no more than 7 days beyond injury and the applicant has been 12 months free of seizures and seizure medication."],
+    elevated: ["Recurrent seizures, active meds, or unclear history increase risk significantly."],
+    actions: ["Do not submit without a clear seizure timeline."],
+    lane: "Higher-risk neurologic review"
+  },
+  {
+    name: "Corneal refractive surgery",
+    category: "Ophthalmology",
+    aliases: ["lasik", "prk", "refractive surgery"],
+    baseline: "Vision history requires review when post-surgical stability or corrected vision standards are not clearly documented.",
+    tags: ["Vision", "Post-op stability matters"],
+    docs: ["All previous clinical notes from the eye doctor."],
+    favorable: ["FY25 guidance is more favorable when the surgery is stable for at least 90 days and the applicant meets vision requirements."],
+    elevated: ["Complications or missing eye records weaken the packet."],
+    actions: ["Get the most recent eye records before MEPS discussion."],
+    lane: "Often straightforward if stable"
+  },
+  {
+    name: "Glaucoma / ocular hypertension",
+    category: "Ophthalmology",
+    aliases: ["glaucoma", "ocular hypertension"],
+    baseline: "DoDI 6130.03 lists glaucoma, ocular hypertension, pre-glaucoma, or glaucoma suspect history as disqualifying for accession review.",
+    tags: ["DoDI 6.3", "Vision"],
+    docs: ["All previous clinical notes from the eye doctor including pressure readings."],
+    favorable: ["FY25 guidance is more favorable when the history is only pre-glaucoma or glaucoma suspect with no true glaucoma/ocular hypertension in the past 5 years; ocular pressures below 25 are favorable."],
+    elevated: ["True glaucoma history, persistent elevated pressures, or no records increase risk."],
+    actions: ["Get the eye pressure trend and provider assessment."],
+    lane: "Needs specialist records"
+  },
+  {
+    name: "Hearing threshold failure",
+    category: "Audiology",
+    aliases: ["hearing", "audiology", "hearing threshold"],
+    baseline: "DoDI 6130.03 sets audiometric thresholds for accession; failure to meet those thresholds can be disqualifying.",
+    tags: ["DoDI 6.6", "Audiology"],
+    docs: ["No additional FY25 requirements listed beyond the hearing data itself."],
+    favorable: ["Packet posture depends mostly on the actual audiogram and whether the threshold problem is confirmed."],
+    elevated: ["Persistent threshold exceedance is the main issue."],
+    actions: ["Ensure the hearing data is current and accurately captured."],
+    lane: "Primarily test-result driven"
+  },
+  {
+    name: "Hypertension / elevated BP",
+    category: "Cardiology",
+    aliases: ["hypertension", "blood pressure"],
+    baseline: "Cardiovascular review becomes more important when blood pressure remains uncontrolled despite medication.",
+    tags: ["Cardiology"],
+    docs: ["Pharmacy report showing BP medication prescriptions or lack thereof."],
+    favorable: ["FY25 guidance waives all cases unless there is current uncontrolled hypertension despite medications."],
+    elevated: ["Uncontrolled readings despite treatment increase risk."],
+    actions: ["Show medication pattern and current control status."],
+    lane: "Often lower-risk if controlled"
+  },
+  {
+    name: "Aortic / mitral regurgitation",
+    category: "Cardiology",
+    aliases: ["regurgitation", "echo", "valve"],
+    baseline: "Valve disease requires current imaging-based review.",
+    tags: ["Cardiology", "Echo required"],
+    docs: ["Associated clinical encounters / notes.", "Pharmacy records over the last 3 years.", "Echocardiogram within the last 12 months."],
+    favorable: ["FY25 guidance is more favorable up to mild aortic/mitral regurgitation proven by echo within the last 12 months."],
+    elevated: ["More than mild disease or no current echo increases risk."],
+    actions: ["Do not submit without the current echo report."],
+    lane: "Specialist-data driven review"
+  },
+  {
+    name: "SVT / atrial flutter / atrial fibrillation",
+    category: "Cardiology",
+    aliases: ["svt", "atrial flutter", "afib", "atrial fibrillation"],
+    baseline: "Arrhythmia history requires close cardiovascular review and current records.",
+    tags: ["Cardiology", "Rhythm history matters"],
+    docs: ["Associated clinical encounters / notes.", "Pharmacy records over the last 3 years."],
+    favorable: ["FY25 guidance is more favorable for atrial flutter only, successfully treated with catheter ablation and without recurrence for 90 days."],
+    elevated: ["AFib history, recurrence, or persistent medication dependence increase risk."],
+    actions: ["Make the rhythm diagnosis and post-treatment status precise."],
+    lane: "Often higher scrutiny"
+  },
+  {
+    name: "GERD",
+    category: "Gastroenterology",
+    aliases: ["gerd", "reflux"],
+    baseline: "GI symptom burden and medication dependence drive the review posture.",
+    tags: ["GI"],
+    docs: ["Applicant statement commenting on current symptoms over the last year, difficulty swallowing, and medication used for management."],
+    favorable: ["Controlled symptoms with straightforward management tend to posture better than severe ongoing symptoms."],
+    elevated: ["Pain, dysphagia, or escalating treatment needs increase concern."],
+    actions: ["Use the statement to define current symptom frequency and meds."],
+    lane: "Usually records-and-symptom driven"
+  },
+  {
+    name: "Hypothyroidism",
+    category: "Endocrinology",
+    aliases: ["thyroid", "hypothyroid"],
+    baseline: "Endocrine conditions are reviewed largely through current lab stability.",
+    tags: ["Endocrinology"],
+    docs: ["Most recent thyroid bloodwork within the last 12 months."],
+    favorable: ["FY25 guidance is more favorable with euthyroid labs with or without medication in the last 12 months."],
+    elevated: ["Missing recent labs or unstable dosing weakens posture."],
+    actions: ["Get the most recent thyroid labs before submission."],
+    lane: "Often straightforward if stable"
+  },
+  {
+    name: "Diabetic disorder / prediabetes history",
+    category: "Endocrinology",
+    aliases: ["diabetes", "prediabetes", "a1c"],
+    baseline: "Endocrine glucose disorders require current lab confirmation and medication review.",
+    tags: ["Endocrinology", "Lab-driven"],
+    docs: ["Most recent hemoglobin A1c within the last 6 months.", "Pharmacy report."],
+    favorable: ["FY25 guidance is more favorable when A1c is below 5.7 within the past 6 months without insulin or other diabetes medicines."],
+    elevated: ["Active diabetic treatment or abnormal current labs increase risk."],
+    actions: ["Get the recent A1c before packet building."],
+    lane: "Lab-driven review"
+  }
+];
+
+const categoryFilter = document.getElementById('categoryFilter');
+const conditionSearch = document.getElementById('conditionSearch');
+const conditionList = document.getElementById('conditionList');
+const factChips = document.getElementById('factChips');
+const recordsStatus = document.getElementById('recordsStatus');
+const timeSince = document.getElementById('timeSince');
+const activityLevel = document.getElementById('activityLevel');
+const recruiterNotes = document.getElementById('recruiterNotes');
+
+function fillDatalist(items) {
+  conditionList.innerHTML = items.map(c => `<option value="${c.name}"></option>`).join('');
+}
+function buildCategories() {
+  const cats = ['All categories', ...new Set(conditions.map(c => c.category))];
+  categoryFilter.innerHTML = cats.map(c => `<option>${c}</option>`).join('');
+}
+function buildFactChips() {
+  factChips.innerHTML = allFacts.map(f => `<button type="button" class="chip" data-id="${f.id}">${f.label}</button>`).join('');
+  factChips.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => chip.classList.toggle('active'));
+  });
+}
+function getActiveFacts() {
+  return [...factChips.querySelectorAll('.chip.active')].map(el => el.dataset.id);
+}
+function findCondition(name) {
+  const q = (name || '').trim().toLowerCase();
+  if (!q) return null;
+  return conditions.find(c => c.name.toLowerCase() === q) || conditions.find(c => [c.name, ...(c.aliases||[])].some(a => a.toLowerCase().includes(q) || q.includes(a.toLowerCase())));
+}
+function renderConditionList() {
+  const cat = categoryFilter.value;
+  const items = cat && cat !== 'All categories' ? conditions.filter(c => c.category === cat) : conditions;
+  fillDatalist(items);
+}
+
+function computeDecision(condition, facts, records, timeKey, activityKey) {
+  let score = 0;
+  const has = key => facts.includes(key);
+  if (has('currentSymptoms')) score += 3;
+  if (has('recentTreatment')) score += 3;
+  if (has('hospitalization')) score += 3;
+  if (has('surgery')) score += 1;
+  if (has('activityLimits')) score += 2;
+  if (has('recurrence')) score += 2;
+  if (!has('pharmacyReady') && /pharmacy/i.test(condition.docs.join(' '))) score += 1;
+  if (!has('specialistReady') && /eye doctor|echo|sleep study|imaging|clinical encounters|consult/i.test(condition.docs.join(' '))) score += 1;
+  if (records === 'none') score += 2;
+  if (records === 'partial') score += 1;
+  if (timeKey === 'current' || timeKey === 'lt6') score += 3;
+  else if (timeKey === 'm6to12') score += 2;
+  else if (timeKey === 'y1to2') score += 1;
+  if (activityKey === 'limited') score += 2;
+  else if (activityKey === 'moderate') score += 1;
+  if (has('stableOffMeds')) score -= 1;
+  if (has('physicallyActive')) score -= 1;
+  if (has('recentTesting')) score -= 1;
+  if (has('lettersSupport')) score -= 0.5;
+
+  let statusClass = 'status-mid';
+  let lane = condition.lane;
+  let packet = 'Build packet before routing';
+  let headline = 'Potentially disqualifying / waiver or prescreen review likely';
+  let message = 'The selected condition appears to need a waiver-quality packet or a strong prescreen submission. Use the document list below to tighten the file before routing.';
+
+  if (score <= 1) {
+    statusClass = 'status-low';
+    lane = 'Lower-risk review lane likely';
+    packet = 'Lean packet may work if records are clean';
+    headline = 'Lower-risk posture based on current inputs';
+    message = 'Current inputs point toward a more favorable lane, but the packet still needs the required condition-specific documents and the universal TTP items.';
+  } else if (score >= 6) {
+    statusClass = 'status-high';
+    lane = 'Higher-risk review lane';
+    packet = 'Full packet strongly recommended';
+    headline = 'Higher-risk posture based on current inputs';
+    message = 'Current facts show one or more escalation points such as recent symptoms/treatment, hospitalization, recurrence, limited activity, or missing records. Build the full packet before trying to push the case.';
+  }
+
+  const actionBoosters = [];
+  if (!has('pharmacyReady') && /pharmacy/i.test(condition.docs.join(' '))) actionBoosters.push('Get the pharmacy report before submission.');
+  if (!has('specialistReady') && /eye doctor|echo|sleep study|imaging|clinical encounters|consult/i.test(condition.docs.join(' '))) actionBoosters.push('Gather specialist notes / imaging / consult records before submission.');
+  if (records === 'none') actionBoosters.push('No records are marked in hand - start with the universal packet items and the condition-specific records list.');
+  if (timeKey === 'unknown') actionBoosters.push('Pin down the last treatment / last symptom date before routing the case.');
+  if (activityKey === 'unknown' && /exercise|sports|physical activity|fitness/i.test(condition.docs.join(' ') + condition.actions.join(' '))) actionBoosters.push('Get an exercise or physical activity statement because current function matters for this condition.');
+
+  return { score, statusClass, lane, packet, headline, message, actionBoosters };
+}
+
+function renderDecision() {
+  const condition = findCondition(conditionSearch.value);
+  if (!condition) {
+    setDefaultState('Condition not found', 'Pick a condition from the searchable list or start typing a common alias like asthma, ADHD, eczema, scoliosis, seizure, sleep apnea, or glaucoma.');
+    return;
+  }
+
+  const facts = getActiveFacts();
+  const decision = computeDecision(condition, facts, recordsStatus.value, timeSince.value, activityLevel.value);
+
+  document.getElementById('metricCondition').textContent = condition.name;
+  document.getElementById('metricCategory').textContent = condition.category;
+  document.getElementById('metricLane').textContent = decision.lane;
+  document.getElementById('metricPacket').textContent = decision.packet;
+
+  const banner = document.getElementById('statusBanner');
+  banner.className = `status-banner ${decision.statusClass}`;
+  banner.innerHTML = `<div><h3>${decision.headline}</h3><p>${decision.message}</p></div>`;
+
+  document.getElementById('conditionTitle').textContent = condition.name;
+  document.getElementById('conditionTags').innerHTML = condition.tags.map(t => `<span class="inline-tag">${t}</span>`).join('');
+  document.getElementById('baselineText').textContent = condition.baseline;
+
+  const docs = [...condition.docs];
+  document.getElementById('docList').innerHTML = docs.map(d => `<li>${d}</li>`).join('');
+
+  const riskItems = [
+    ...condition.favorable.map(i => `Favorable posture: ${i}`),
+    ...condition.elevated.map(i => `Higher-risk flag: ${i}`)
+  ];
+  document.getElementById('riskList').innerHTML = riskItems.map(i => `<li>${i}</li>`).join('');
+
+  const actions = [...condition.actions, ...decision.actionBoosters];
+  if (facts.includes('hospitalization')) actions.unshift('Hospitalization is marked - verify whether inpatient records or discharge paperwork must be added.');
+  if (facts.includes('currentSymptoms')) actions.unshift('Current symptoms are marked - expect closer review and make sure the packet explains present-day function clearly.');
+  document.getElementById('actionList').innerHTML = [...new Set(actions)].map(a => `<li>${a}</li>`).join('');
+
+  document.getElementById('universalList').innerHTML = universalDocs.map(u => `<li>${u}</li>`).join('');
+
+  const notes = recruiterNotes.value.trim();
+  document.getElementById('customNotes').innerHTML = notes
+    ? `<strong>Recruiter notes entered:</strong><br>${notes.replace(/\n/g, '<br>')}`
+    : 'No applicant-specific notes added yet.';
+}
+
+function setDefaultState(title, text) {
+  document.getElementById('metricCondition').textContent = title;
+  document.getElementById('metricCategory').textContent = '-';
+  document.getElementById('metricLane').textContent = '-';
+  document.getElementById('metricPacket').textContent = '-';
+  const banner = document.getElementById('statusBanner');
+  banner.className = 'status-banner status-info';
+  banner.innerHTML = `<div><h3>${title}</h3><p>${text}</p></div>`;
+  document.getElementById('conditionTitle').textContent = title;
+  document.getElementById('conditionTags').innerHTML = '';
+  document.getElementById('baselineText').textContent = text;
+  document.getElementById('docList').innerHTML = '<li>Select a condition to populate this section.</li>';
+  document.getElementById('riskList').innerHTML = '<li>Select a condition to populate this section.</li>';
+  document.getElementById('actionList').innerHTML = '<li>Select a condition to populate this section.</li>';
+  document.getElementById('universalList').innerHTML = universalDocs.map(u => `<li>${u}</li>`).join('');
+  document.getElementById('customNotes').textContent = 'No applicant-specific notes added yet.';
+}
+
+function resetAll() {
+  document.getElementById('applicantName').value = '';
+  conditionSearch.value = '';
+  recordsStatus.value = 'none';
+  timeSince.value = 'unknown';
+  activityLevel.value = 'unknown';
+  recruiterNotes.value = '';
+  factChips.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  setDefaultState('Ready for condition review', 'Select a condition and recruiter facts, then run the tool. The output will show the baseline standard, higher-risk flags, what documents to gather, and next recruiter actions.');
+}
+
+buildCategories();
+buildFactChips();
+renderConditionList();
+setDefaultState('Ready for condition review', 'Select a condition and recruiter facts, then run the tool. The output will show the baseline standard, higher-risk flags, what documents to gather, and next recruiter actions.');
+
+categoryFilter.addEventListener('change', renderConditionList);
+document.getElementById('runBtn').addEventListener('click', renderDecision);
+document.getElementById('resetBtn').addEventListener('click', resetAll);
+conditionSearch.addEventListener('keydown', e => { if (e.key === 'Enter') renderDecision(); });
+</script>
+</body>
+</html>
